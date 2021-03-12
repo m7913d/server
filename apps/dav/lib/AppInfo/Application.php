@@ -53,9 +53,13 @@ use OCA\DAV\CardDAV\PhotoCache;
 use OCA\DAV\CardDAV\SyncService;
 use OCA\DAV\Events\CalendarCreatedEvent;
 use OCA\DAV\Events\CalendarDeletedEvent;
+use OCA\DAV\Events\CalendarMovedToTrashEvent;
 use OCA\DAV\Events\CalendarObjectCreatedEvent;
 use OCA\DAV\Events\CalendarObjectDeletedEvent;
+use OCA\DAV\Events\CalendarObjectMovedToTrashEvent;
+use OCA\DAV\Events\CalendarObjectRestoredEvent;
 use OCA\DAV\Events\CalendarObjectUpdatedEvent;
+use OCA\DAV\Events\CalendarRestoredEvent;
 use OCA\DAV\Events\CalendarShareUpdatedEvent;
 use OCA\DAV\Events\CalendarUpdatedEvent;
 use OCA\DAV\HookManager;
@@ -120,7 +124,11 @@ class Application extends App implements IBootstrap {
 		$context->registerEventListener(CalendarDeletedEvent::class, ActivityUpdaterListener::class);
 		$context->registerEventListener(CalendarDeletedEvent::class, CalendarObjectReminderUpdaterListener::class);
 		$context->registerEventListener(CalendarDeletedEvent::class, CalendarDeletionDefaultUpdaterListener::class);
+		$context->registerEventListener(CalendarMovedToTrashEvent::class, ActivityUpdaterListener::class);
+		$context->registerEventListener(CalendarMovedToTrashEvent::class, CalendarObjectReminderUpdaterListener::class);
 		$context->registerEventListener(CalendarUpdatedEvent::class, ActivityUpdaterListener::class);
+		$context->registerEventListener(CalendarRestoredEvent::class, ActivityUpdaterListener::class);
+		$context->registerEventListener(CalendarRestoredEvent::class, CalendarObjectReminderUpdaterListener::class);
 		$context->registerEventListener(CalendarObjectCreatedEvent::class, ActivityUpdaterListener::class);
 		$context->registerEventListener(CalendarObjectCreatedEvent::class, CalendarContactInteractionListener::class);
 		$context->registerEventListener(CalendarObjectCreatedEvent::class, CalendarObjectReminderUpdaterListener::class);
@@ -129,6 +137,10 @@ class Application extends App implements IBootstrap {
 		$context->registerEventListener(CalendarObjectUpdatedEvent::class, CalendarObjectReminderUpdaterListener::class);
 		$context->registerEventListener(CalendarObjectDeletedEvent::class, ActivityUpdaterListener::class);
 		$context->registerEventListener(CalendarObjectDeletedEvent::class, CalendarObjectReminderUpdaterListener::class);
+		$context->registerEventListener(CalendarObjectMovedToTrashEvent::class, ActivityUpdaterListener::class);
+		$context->registerEventListener(CalendarObjectMovedToTrashEvent::class, CalendarObjectReminderUpdaterListener::class);
+		$context->registerEventListener(CalendarObjectRestoredEvent::class, ActivityUpdaterListener::class);
+		$context->registerEventListener(CalendarObjectRestoredEvent::class, CalendarObjectReminderUpdaterListener::class);
 		$context->registerEventListener(CalendarShareUpdatedEvent::class, CalendarContactInteractionListener::class);
 
 		$context->registerNotifierService(Notifier::class);
@@ -201,6 +213,7 @@ class Application extends App implements IBootstrap {
 			$syncService = $container->query(SyncService::class);
 			$syncService->updateUser($user);
 		});
+
 
 		$dispatcher->addListener('\OCA\DAV\CalDAV\CalDavBackend::updateShares', function (GenericEvent $event) use ($container) {
 			/** @var Backend $backend */
