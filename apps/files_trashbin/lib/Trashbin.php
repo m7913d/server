@@ -989,8 +989,7 @@ class Trashbin {
 		$query = new CacheQueryBuilder(
 			\OC::$server->getDatabaseConnection(),
 			\OC::$server->getSystemConfig(),
-			\OC::$server->getLogger(),
-			$cache
+			\OC::$server->getLogger()
 		);
 		$normalizedParentPath = ltrim(Filesystem::normalizePath(dirname('files_trashbin/versions/'. $filename)), '/');
 		$parentId = $cache->getId($normalizedParentPath);
@@ -999,7 +998,7 @@ class Trashbin {
 		}
 
 		$query->selectFileCache()
-			->whereStorageId()
+			->whereStorageId($cache->getNumericStorageId())
 			->andWhere($query->expr()->eq('parent', $query->createNamedParameter($parentId)))
 			->andWhere($query->expr()->iLike('name', $query->createNamedParameter($pattern)));
 
